@@ -38,6 +38,7 @@
             this.labName = new System.Windows.Forms.Label();
             this.listRepo = new System.Windows.Forms.ListBox();
             this.btnNewRepo = new Bunifu.Framework.UI.BunifuTileButton();
+            this.labCurrentFile = new System.Windows.Forms.Label();
             this.topBar.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -98,6 +99,7 @@
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.Controls.Add(this.labCurrentFile);
             this.panel1.Controls.Add(this.btnRemove);
             this.panel1.Controls.Add(this.labProcessed);
             this.panel1.Controls.Add(this.progressFile);
@@ -136,7 +138,7 @@
             // labProcessed
             // 
             this.labProcessed.AutoSize = true;
-            this.labProcessed.Location = new System.Drawing.Point(292, 288);
+            this.labProcessed.Location = new System.Drawing.Point(292, 251);
             this.labProcessed.Name = "labProcessed";
             this.labProcessed.Size = new System.Drawing.Size(206, 28);
             this.labProcessed.TabIndex = 12;
@@ -251,6 +253,16 @@
             this.btnNewRepo.TabIndex = 4;
             this.btnNewRepo.Click += new System.EventHandler(this.btnNewRepo_Click);
             // 
+            // labCurrentFile
+            // 
+            this.labCurrentFile.AutoSize = true;
+            this.labCurrentFile.Location = new System.Drawing.Point(292, 288);
+            this.labCurrentFile.Name = "labCurrentFile";
+            this.labCurrentFile.Size = new System.Drawing.Size(175, 28);
+            this.labCurrentFile.TabIndex = 14;
+            this.labCurrentFile.Text = "Current File: N/A";
+            this.labCurrentFile.Visible = false;
+            // 
             // HastyForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 28F);
@@ -294,6 +306,7 @@
         private Bunifu.Framework.UI.BunifuProgressBar progressFile;
         private System.Windows.Forms.Label labProcessed;
         private Bunifu.Framework.UI.BunifuTileButton btnRemove;
+        private System.Windows.Forms.Label labCurrentFile;
     }
 }
 

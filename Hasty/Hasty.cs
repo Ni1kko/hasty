@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -138,6 +139,7 @@ namespace Hasty {
 
             progressTotal.Visible = true;
             progressFile.Visible = true;
+            labCurrentFile.Visible = true;
 
             bool success = await WalkFolder(repo, files);
 
@@ -193,13 +195,17 @@ namespace Hasty {
                     float totalValue = (((float)_filesHandled / (float)_totalFiles) * 100);
                     progressTotal.Value = (int)totalValue;
 
+
                     if (File.Exists(filePath)) {
                         string checkSum = Files.CheckSum(filePath);
-                        if (checkSum == item.hash)
+                        if (checkSum == item.hash) {
+                            labProcessed.Text = $"Files Processed: {_filesHandled}/{_totalFiles} (100%)";
                             continue;
+                        }
                     }
 
                     _updated++;
+                    labCurrentFile.Text = "Current File: " + item.title;
 
                     //filePath = filePath.Replace("//", "/");
                     await TcpData.RequestFile(repo, remotePath, filePath, (long progress) => {

@@ -28,7 +28,10 @@ namespace HastyServer {
         public List<DynatreeItem> children;
         public int totalFiles;
 
-        public DynatreeItem(FileSystemInfo fsi) {
+        public DynatreeItem(FileSystemInfo fsi, bool refresh = false) {
+            if (refresh)
+                TreeCache.hashes.Clear();
+
             title = fsi.Name;
             children = new List<DynatreeItem>();
 
@@ -70,6 +73,41 @@ namespace HastyServer {
 
     class Program {
 
+        static Thread updateThread = null;
+        static DynatreeItem di;
+
+        private static void OnFileChange(object source, FileSystemEventArgs e) {
+            Console.WriteLine("File: " + e.FullPath + " was changed: " + e.ChangeType);
+
+            try {
+                bool sleepAgain = true;
+                if (updateThread != null && updateThread.IsAlive) {
+                    sleepAgain = true;
+                    return;
+                }
+
+
+                updateThread = new Thread(() => {
+                    try {
+                        while (sleepAgain) {
+                            sleepAgain = false;
+                            Thread.Sleep(15000);
+                        }
+
+                        sleepAgain = true;
+                        Console.WriteLine("Generating new file hashes...");
+                        di = new DynatreeItem(new DirectoryInfo("mod"), true);
+
+                        Console.WriteLine("New hashes generated...");
+                    }
+                    catch { }
+                });
+                updateThread.Start();
+            } catch (Exception ex) {
+                Console.WriteLine("File changed exception: " + ex);
+            }
+        }
+
         static void Main(string[] args) {
 
             if (!File.Exists("repo.json")) {
@@ -84,8 +122,18 @@ namespace HastyServer {
                 return;
             }
 
+            FileSystemWatcher watcher = new FileSystemWatcher();
+            watcher.Path = "mod";
+            watcher.IncludeSubdirectories = true;
+
+            watcher.Changed += new FileSystemEventHandler(OnFileChange);
+            watcher.Created += new FileSystemEventHandler(OnFileChange);
+
+            watcher.EnableRaisingEvents = true;
+
+
             Console.WriteLine("Generating file hashes...");
-            DynatreeItem di = new DynatreeItem(new DirectoryInfo("mod"));
+            di = new DynatreeItem(new DirectoryInfo("mod"));
 
             Console.WriteLine("Hashes generated...");
 
