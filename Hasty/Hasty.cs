@@ -24,6 +24,8 @@ namespace Hasty {
 
         private void UpdateRepos() {
             try {
+                listRepo.Items.Clear();
+
                 Settings s = Files.GetSettings();
 
                 _repos = s.Repos;
@@ -97,16 +99,20 @@ namespace Hasty {
                 MessageBox.Show("Error updating repository: " + res.Item2.Message, "An error occured :(", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-
+             
 
             if (repo != _selected) {
+
+                repo = Files.Update(_selected, repo);
+
                 _repos.Remove(_selected);
                 _repos.Add(repo);
 
                 Files.UpdateRepos(_repos);
+                UpdateRepos();
             }
 
-            // start file uploads and stuff
+            // start file downloads and stuff
         }
     }
 }

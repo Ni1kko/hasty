@@ -63,5 +63,37 @@ namespace Hasty {
             s.Repos = repos;
             SetSettings(s);
         }
+
+        public static Repo Update(Repo old, Repo newer) {
+            Repo ret = new Repo();
+            if (newer.Name == null) {
+                ret.Name = old.Name;
+            } else {
+                ret.Name = newer.Name;
+            }
+
+            if (newer.Url == null) {
+                ret.Url = old.Url;
+            } else {
+                ret.Url = newer.Url;
+            }
+
+            if (newer.RemoteFolder == null) {
+                ret.RemoteFolder = old.RemoteFolder;
+            } else {
+                ret.RemoteFolder = newer.RemoteFolder;
+            }
+
+            ret.LastCheck = Misc.UnixTime;
+            ret.LastUpdate = Misc.UnixTime;
+
+            if (newer.Folder == null) {
+                ret.Folder = old.Folder;
+            } else {
+                ret.Folder = newer.Folder;
+            }
+
+            return ret;
+        }
     }
 }
