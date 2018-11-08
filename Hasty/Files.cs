@@ -115,9 +115,9 @@ namespace Hasty {
         }
 
         public static string CheckSum(string filePath) {
-            using (SHA512 SHA512 = SHA512.Create()) {
-                using (FileStream fileStream = File.OpenRead(filePath))
-                    return Convert.ToBase64String(SHA512.ComputeHash(fileStream));
+            using (var inputStream = File.Open(filePath, FileMode.Open)) {
+                var md5 = MD5.Create();
+                return Convert.ToBase64String(md5.ComputeHash(inputStream));
             }
         }
     }

@@ -99,6 +99,10 @@ namespace Hasty {
             if (_selected == null)
                 return;
 
+            btnUpdate.Enabled = false;
+            btnRemove.Enabled = false;
+            btnNewRepo.Enabled = false;
+
             Tuple<Repo, Exception> res = await Web.ReadUrlAsync(_selected.Url);
             Repo repo = res.Item1;
             if (repo == null) {
@@ -134,7 +138,6 @@ namespace Hasty {
 
             progressTotal.Visible = true;
             progressFile.Visible = true;
-            labProcessed.Visible = true;
 
             bool success = await WalkFolder(repo, files);
 
@@ -152,6 +155,10 @@ namespace Hasty {
             } else {
                 MessageBox.Show("No new updates found.", "Update Finished", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+
+            btnUpdate.Enabled = true;
+            btnRemove.Enabled = true;
+            btnNewRepo.Enabled = true;
 
         }
 
@@ -186,8 +193,6 @@ namespace Hasty {
                     float totalValue = (((float)_filesHandled / (float)_totalFiles) * 100);
                     progressTotal.Value = (int)totalValue;
 
-                    labProcessed.Text = $"Files Processed: {_filesHandled}/{_totalFiles}";
-
                     if (File.Exists(filePath)) {
                         string checkSum = Files.CheckSum(filePath);
                         if (checkSum == item.hash)
@@ -200,6 +205,9 @@ namespace Hasty {
                     await TcpData.RequestFile(repo, remotePath, filePath, (long progress) => {
                         float percCompleted = (((float)progress / (float)item.fileSize) * 100);
                         progressFile.Value = (int)percCompleted;
+
+                        labProcessed.Visible = true;
+                        labProcessed.Text = $"Files Processed: {_filesHandled}/{_totalFiles} ({(int)percCompleted}%)";
                     });
 
 
