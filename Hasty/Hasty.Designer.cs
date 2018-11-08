@@ -36,6 +36,8 @@
             this.listRepo = new System.Windows.Forms.ListBox();
             this.btnNewRepo = new Bunifu.Framework.UI.BunifuTileButton();
             this.progressFile = new Bunifu.Framework.UI.BunifuProgressBar();
+            this.labProcessed = new System.Windows.Forms.Label();
+            this.btnRemove = new Bunifu.Framework.UI.BunifuTileButton();
             this.topBar.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -96,6 +98,8 @@
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.Controls.Add(this.btnRemove);
+            this.panel1.Controls.Add(this.labProcessed);
             this.panel1.Controls.Add(this.progressFile);
             this.panel1.Controls.Add(this.progressTotal);
             this.panel1.Controls.Add(this.btnUpdate);
@@ -113,14 +117,15 @@
             // 
             this.progressTotal.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(50)))), ((int)(((byte)(50)))));
             this.progressTotal.BorderRadius = 5;
-            this.progressTotal.Location = new System.Drawing.Point(297, 408);
+            this.progressTotal.Location = new System.Drawing.Point(297, 349);
             this.progressTotal.Margin = new System.Windows.Forms.Padding(5, 7, 5, 7);
             this.progressTotal.MaximumValue = 100;
             this.progressTotal.Name = "progressTotal";
             this.progressTotal.ProgressColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.progressTotal.Size = new System.Drawing.Size(346, 31);
             this.progressTotal.TabIndex = 10;
-            this.progressTotal.Value = 50;
+            this.progressTotal.Value = 0;
+            this.progressTotal.Visible = false;
             // 
             // btnUpdate
             // 
@@ -135,7 +140,7 @@
             this.btnUpdate.ImageZoom = 0;
             this.btnUpdate.LabelPosition = 40;
             this.btnUpdate.LabelText = "Update";
-            this.btnUpdate.Location = new System.Drawing.Point(297, 455);
+            this.btnUpdate.Location = new System.Drawing.Point(297, 396);
             this.btnUpdate.Margin = new System.Windows.Forms.Padding(0);
             this.btnUpdate.Name = "btnUpdate";
             this.btnUpdate.Size = new System.Drawing.Size(346, 47);
@@ -206,14 +211,45 @@
             // 
             this.progressFile.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(50)))), ((int)(((byte)(50)))));
             this.progressFile.BorderRadius = 5;
-            this.progressFile.Location = new System.Drawing.Point(297, 362);
+            this.progressFile.Location = new System.Drawing.Point(297, 303);
             this.progressFile.Margin = new System.Windows.Forms.Padding(7, 10, 7, 10);
             this.progressFile.MaximumValue = 100;
             this.progressFile.Name = "progressFile";
             this.progressFile.ProgressColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.progressFile.Size = new System.Drawing.Size(346, 31);
             this.progressFile.TabIndex = 11;
-            this.progressFile.Value = 50;
+            this.progressFile.Value = 0;
+            this.progressFile.Visible = false;
+            // 
+            // labProcessed
+            // 
+            this.labProcessed.AutoSize = true;
+            this.labProcessed.Location = new System.Drawing.Point(292, 265);
+            this.labProcessed.Name = "labProcessed";
+            this.labProcessed.Size = new System.Drawing.Size(206, 28);
+            this.labProcessed.TabIndex = 12;
+            this.labProcessed.Text = "Files Processed: 0/0";
+            this.labProcessed.Visible = false;
+            // 
+            // btnRemove
+            // 
+            this.btnRemove.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.btnRemove.color = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.btnRemove.colorActive = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
+            this.btnRemove.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnRemove.Font = new System.Drawing.Font("Lucida Grande", 11F);
+            this.btnRemove.ForeColor = System.Drawing.Color.White;
+            this.btnRemove.Image = null;
+            this.btnRemove.ImagePosition = 0;
+            this.btnRemove.ImageZoom = 0;
+            this.btnRemove.LabelPosition = 40;
+            this.btnRemove.LabelText = "Remove Repo";
+            this.btnRemove.Location = new System.Drawing.Point(297, 455);
+            this.btnRemove.Margin = new System.Windows.Forms.Padding(0);
+            this.btnRemove.Name = "btnRemove";
+            this.btnRemove.Size = new System.Drawing.Size(346, 47);
+            this.btnRemove.TabIndex = 13;
+            this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
             // 
             // HastyForm
             // 
@@ -255,6 +291,8 @@
         private Bunifu.Framework.UI.BunifuTileButton btnUpdate;
         private System.Windows.Forms.Label labUpdated;
         private Bunifu.Framework.UI.BunifuProgressBar progressFile;
+        private System.Windows.Forms.Label labProcessed;
+        private Bunifu.Framework.UI.BunifuTileButton btnRemove;
     }
 }
 

@@ -9,13 +9,22 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Security.Cryptography;
+using FubarDev.FtpServer;
+using FubarDev.FtpServer.FileSystem.DotNet;
+using Microsoft.Extensions.DependencyInjection;
+using System.Threading;
 
 namespace HastyServer {
+
+    class TreeCache {
+        public static Dictionary<string, string> hashes = new Dictionary<string, string>();
+    }
 
     class DynatreeItem {
         public string title { get; set; }
         public bool isFolder { get; set; }
         public string hash { get; set; }
+        public long fileSize;
         public List<DynatreeItem> children;
         public int totalFiles;
 
@@ -31,7 +40,14 @@ namespace HastyServer {
                 hash = "";
             } else {
                 isFolder = false;
-                hash = CheckSum(fsi.FullName);
+                fileSize = new FileInfo(fsi.FullName).Length;
+                if (TreeCache.hashes.ContainsKey(fsi.FullName)) {
+                    hash = TreeCache.hashes[fsi.FullName];
+                } else {
+                    hash = CheckSum(fsi.FullName);
+                    TreeCache.hashes[fsi.FullName] = hash;
+                }
+                
             }
             
         }
@@ -68,7 +84,12 @@ namespace HastyServer {
                 return;
             }
 
-            
+            Console.WriteLine("Generating file hashes...");
+            DynatreeItem di = new DynatreeItem(new DirectoryInfo("mod"));
+
+            Console.WriteLine("Hashes generated...");
+
+            new Thread(TcpCommunication.StartListener).Start();
 
             HttpServer server = new HttpServer();
             server.RequestReceived += (s, e) => {
@@ -81,25 +102,10 @@ namespace HastyServer {
                         writer.Write(File.ReadAllText("repo.json"));
                     } else if (path == "/mod") {
 
-                        DynatreeItem di = new DynatreeItem(new DirectoryInfo("mod"));
-
                         int files = Directory.GetFiles("mod", "*", SearchOption.AllDirectories).Length;
                         di.totalFiles = files;
                         string result = di.DynatreeToJson();
                         writer.Write(result);
-
-                    } else if (path.StartsWith("/mod")) {
-                        string file = path.Substring(1);
-
-                        Console.WriteLine("File request: " + file);
-
-                        byte[] data = Encoding.UTF8.GetBytes("File not found...");
-
-                        if (File.Exists(file) && !path.Contains("..")) {
-                            data = File.ReadAllBytes(file);
-                        }
-
-                        writer.Write(new Ascii85().Encode(data));
 
                     } else {
 

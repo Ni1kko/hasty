@@ -85,8 +85,25 @@ namespace Hasty {
                 ret.RemoteFolder = newer.RemoteFolder;
             }
 
+            if (newer.SocketConnection == null) {
+                ret.SocketConnection = old.SocketConnection;
+            } else {
+                ret.SocketConnection = newer.SocketConnection;
+            }
+
+            if (newer.FolderName == null) {
+                ret.FolderName = old.FolderName;
+            } else {
+                ret.FolderName = newer.FolderName;
+            }
+
             ret.LastCheck = Misc.UnixTime;
-            ret.LastUpdate = Misc.UnixTime;
+
+            if (newer.RemoteFolder == null) {
+                ret.LastUpdate = old.LastUpdate;
+            } else {
+                ret.LastUpdate = newer.LastUpdate;
+            }
 
             if (newer.Folder == null) {
                 ret.Folder = old.Folder;

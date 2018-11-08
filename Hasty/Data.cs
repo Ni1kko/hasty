@@ -11,6 +11,8 @@ namespace Hasty {
         public string Name;
         public string Url;
         public string RemoteFolder;
+        public string SocketConnection;
+        public string FolderName;
         public int LastCheck;
         public int LastUpdate;
         public string Folder;
@@ -24,6 +26,7 @@ namespace Hasty {
         public string title { get; set; }
         public bool isFolder { get; set; }
         public string hash { get; set; }
+        public long fileSize;
         public List<DynatreeItem> children;
         public int totalFiles;
 

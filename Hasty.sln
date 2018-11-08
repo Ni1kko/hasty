@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hasty", "Hasty\Hasty.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HastyServer", "HastyServer\HastyServer.csproj", "{26294EB9-9A11-491B-AEA8-152AE6EC76BC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FtpServer", "FtpServer\FtpServer.csproj", "{BCF4AF72-6E09-416F-B4A5-D769C7D7B22F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{26294EB9-9A11-491B-AEA8-152AE6EC76BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{26294EB9-9A11-491B-AEA8-152AE6EC76BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{26294EB9-9A11-491B-AEA8-152AE6EC76BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCF4AF72-6E09-416F-B4A5-D769C7D7B22F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCF4AF72-6E09-416F-B4A5-D769C7D7B22F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCF4AF72-6E09-416F-B4A5-D769C7D7B22F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCF4AF72-6E09-416F-B4A5-D769C7D7B22F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

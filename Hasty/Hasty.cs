@@ -18,8 +18,8 @@ namespace Hasty {
         public HastyForm() {
             InitializeComponent();
             Files.Init();
-
             UpdateRepos();
+
         }
 
         private void UpdateRepos() {
@@ -94,6 +94,7 @@ namespace Hasty {
         }
 
         int _filesHandled = 0, _totalFiles = 0;
+        int _updated = 0;
         private async void btnUpdate_Click(object sender, EventArgs e) {
             if (_selected == null)
                 return;
@@ -107,6 +108,8 @@ namespace Hasty {
              
 
             if (repo != _selected) {
+                repo.LastCheck = Misc.UnixTime;
+                repo.LastUpdate = _selected.LastUpdate;
 
                 repo = Files.Update(_selected, repo);
 
@@ -128,23 +131,62 @@ namespace Hasty {
 
             _filesHandled = 0;
             _totalFiles = files.totalFiles;
-            WalkFolder(repo, files);
+
+            progressTotal.Visible = true;
+            progressFile.Visible = true;
+            labProcessed.Visible = true;
+
+            bool success = await WalkFolder(repo, files);
+
+            if (_updated > 0 && success) {
+               
+                bool removed = _repos.Remove(_selected);
+                repo.LastUpdate = Misc.UnixTime;
+                _repos.Add(repo);
+
+                Files.UpdateRepos(_repos);
+                UpdateRepos();
+
+                MessageBox.Show($"Updating files finished.\nTotal files checked: {_totalFiles}, files updated: {_updated}", "Update Finished", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                _updated = 0;
+            } else {
+                MessageBox.Show("No new updates found.", "Update Finished", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
 
         }
 
-        
-        private async void WalkFolder(Repo repo, DynatreeItem folder, string path = "/") {
+        private void btnRemove_Click(object sender, EventArgs e) {
+            if (_selected == null)
+                return;
+
+            DialogResult res = MessageBox.Show("Are you sure you want to remove this repository?", "Remove repo?", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+            if (res == DialogResult.Yes) {
+                _repos.Remove(_selected);
+                Files.UpdateRepos(_repos);
+                UpdateRepos();
+            }
+        }
+
+        private async Task<bool> WalkFolder(Repo repo, DynatreeItem folder, string path = "/") {
+            string repoFolder = repo.Folder + "/" + repo.FolderName;
             foreach(DynatreeItem item in folder.children) {
                 if (item.isFolder) { 
                     string folderPath = path + "/" + item.title;
-                    if (!Directory.Exists(repo.Folder + "/" + folderPath))
-                        Directory.CreateDirectory(repo.Folder + "/" + folderPath);
+                    if (!Directory.Exists(repoFolder + "/" + folderPath))
+                        Directory.CreateDirectory(repoFolder + "/" + folderPath);
 
 
-                    WalkFolder(repo, item, folderPath);
+                   await WalkFolder(repo, item, folderPath);
                 } else {
                     string remotePath = path + "/" + item.title;
-                    string filePath = repo.Folder + "/" + remotePath;
+                    string filePath = repoFolder + "/" + remotePath;
+
+                    _filesHandled++;
+
+                    float totalValue = (((float)_filesHandled / (float)_totalFiles) * 100);
+                    progressTotal.Value = (int)totalValue;
+
+                    labProcessed.Text = $"Files Processed: {_filesHandled}/{_totalFiles}";
 
                     if (File.Exists(filePath)) {
                         string checkSum = Files.CheckSum(filePath);
@@ -152,16 +194,21 @@ namespace Hasty {
                             continue;
                     }
 
-                    //filePath = filePath.Replace("//", "/");
-                    await Web.DownloadFile(repo.RemoteFolder + remotePath, filePath, (double percent) => {
-                        progressFile.Value = (int)percent;
-                    });
-                    _filesHandled++;
+                    _updated++;
 
-                    float totalValue = (((float)_filesHandled / (float)_totalFiles) * 100);
-                    progressTotal.Value = (int)totalValue;
+                    //filePath = filePath.Replace("//", "/");
+                    await TcpData.RequestFile(repo, remotePath, filePath, (long progress) => {
+                        float percCompleted = (((float)progress / (float)item.fileSize) * 100);
+                        progressFile.Value = (int)percCompleted;
+                    });
+
+
+                    //await Web.DownloadFile(repo.RemoteFolder + remotePath, filePath, (double percent) => {
+                    //    progressFile.Value = (int)percent;
+                    //});
                 }
             }
+            return true;
         }
     }
 }
