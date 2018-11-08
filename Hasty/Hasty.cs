@@ -77,7 +77,11 @@ namespace Hasty {
         }
 
         private void btnNewRepo_Click(object sender, EventArgs e) {
-            new AddRepo().Show();
+            AddRepo window = new AddRepo();
+            window.Show();
+            window.FormClosed += new FormClosedEventHandler((object cSender, FormClosedEventArgs cEvent) => {
+                UpdateRepos();
+            });
         }
 
         private void listRepo_SelectedIndexChanged(object sender, EventArgs e) {
@@ -89,6 +93,7 @@ namespace Hasty {
             UpdateSelected(index);
         }
 
+        int _filesHandled = 0, _totalFiles = 0;
         private async void btnUpdate_Click(object sender, EventArgs e) {
             if (_selected == null)
                 return;
@@ -113,6 +118,50 @@ namespace Hasty {
             }
 
             // start file downloads and stuff
+            Tuple<DynatreeItem, Exception> filesResponse = await Web.ReadRepo(repo.RemoteFolder);
+
+            DynatreeItem files = filesResponse.Item1;
+            if (files == null) {
+                MessageBox.Show("Error downloading repository info: " + filesResponse.Item2.Message, "An error occured :(", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            _filesHandled = 0;
+            _totalFiles = files.totalFiles;
+            WalkFolder(repo, files);
+
+        }
+
+        
+        private async void WalkFolder(Repo repo, DynatreeItem folder, string path = "/") {
+            foreach(DynatreeItem item in folder.children) {
+                if (item.isFolder) { 
+                    string folderPath = path + "/" + item.title;
+                    if (!Directory.Exists(repo.Folder + "/" + folderPath))
+                        Directory.CreateDirectory(repo.Folder + "/" + folderPath);
+
+
+                    WalkFolder(repo, item, folderPath);
+                } else {
+                    string remotePath = path + "/" + item.title;
+                    string filePath = repo.Folder + "/" + remotePath;
+
+                    if (File.Exists(filePath)) {
+                        string checkSum = Files.CheckSum(filePath);
+                        if (checkSum == item.hash)
+                            continue;
+                    }
+
+                    //filePath = filePath.Replace("//", "/");
+                    await Web.DownloadFile(repo.RemoteFolder + remotePath, filePath, (double percent) => {
+                        progressFile.Value = (int)percent;
+                    });
+                    _filesHandled++;
+
+                    float totalValue = (((float)_filesHandled / (float)_totalFiles) * 100);
+                    progressTotal.Value = (int)totalValue;
+                }
+            }
         }
     }
 }

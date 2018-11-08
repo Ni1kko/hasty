@@ -28,13 +28,14 @@
             this.btnExit = new System.Windows.Forms.Button();
             this.labTitle = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.btnNewRepo = new Bunifu.Framework.UI.BunifuTileButton();
-            this.listRepo = new System.Windows.Forms.ListBox();
-            this.labName = new System.Windows.Forms.Label();
-            this.labChecked = new System.Windows.Forms.Label();
-            this.labUpdated = new System.Windows.Forms.Label();
+            this.progressTotal = new Bunifu.Framework.UI.BunifuProgressBar();
             this.btnUpdate = new Bunifu.Framework.UI.BunifuTileButton();
-            this.bunifuProgressBar1 = new Bunifu.Framework.UI.BunifuProgressBar();
+            this.labUpdated = new System.Windows.Forms.Label();
+            this.labChecked = new System.Windows.Forms.Label();
+            this.labName = new System.Windows.Forms.Label();
+            this.listRepo = new System.Windows.Forms.ListBox();
+            this.btnNewRepo = new Bunifu.Framework.UI.BunifuTileButton();
+            this.progressFile = new Bunifu.Framework.UI.BunifuProgressBar();
             this.topBar.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -95,7 +96,8 @@
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel1.Controls.Add(this.bunifuProgressBar1);
+            this.panel1.Controls.Add(this.progressFile);
+            this.panel1.Controls.Add(this.progressTotal);
             this.panel1.Controls.Add(this.btnUpdate);
             this.panel1.Controls.Add(this.labUpdated);
             this.panel1.Controls.Add(this.labChecked);
@@ -107,65 +109,18 @@
             this.panel1.Size = new System.Drawing.Size(656, 529);
             this.panel1.TabIndex = 2;
             // 
-            // btnNewRepo
+            // progressTotal
             // 
-            this.btnNewRepo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.btnNewRepo.color = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.btnNewRepo.colorActive = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-            this.btnNewRepo.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnNewRepo.Font = new System.Drawing.Font("Lucida Grande", 11F);
-            this.btnNewRepo.ForeColor = System.Drawing.Color.White;
-            this.btnNewRepo.Image = null;
-            this.btnNewRepo.ImagePosition = 0;
-            this.btnNewRepo.ImageZoom = 0;
-            this.btnNewRepo.LabelPosition = 40;
-            this.btnNewRepo.LabelText = "New Repo";
-            this.btnNewRepo.Location = new System.Drawing.Point(11, 20);
-            this.btnNewRepo.Margin = new System.Windows.Forms.Padding(0, 0, 0, 0);
-            this.btnNewRepo.Name = "btnNewRepo";
-            this.btnNewRepo.Size = new System.Drawing.Size(275, 47);
-            this.btnNewRepo.TabIndex = 4;
-            this.btnNewRepo.Click += new System.EventHandler(this.btnNewRepo_Click);
-            // 
-            // listRepo
-            // 
-            this.listRepo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(50)))), ((int)(((byte)(50)))));
-            this.listRepo.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.listRepo.ForeColor = System.Drawing.Color.White;
-            this.listRepo.FormattingEnabled = true;
-            this.listRepo.ItemHeight = 28;
-            this.listRepo.Location = new System.Drawing.Point(11, 82);
-            this.listRepo.Name = "listRepo";
-            this.listRepo.Size = new System.Drawing.Size(275, 420);
-            this.listRepo.TabIndex = 5;
-            this.listRepo.SelectedIndexChanged += new System.EventHandler(this.listRepo_SelectedIndexChanged);
-            // 
-            // labName
-            // 
-            this.labName.AutoSize = true;
-            this.labName.Location = new System.Drawing.Point(292, 82);
-            this.labName.Name = "labName";
-            this.labName.Size = new System.Drawing.Size(119, 28);
-            this.labName.TabIndex = 6;
-            this.labName.Text = "Name: N/A";
-            // 
-            // labChecked
-            // 
-            this.labChecked.AutoSize = true;
-            this.labChecked.Location = new System.Drawing.Point(292, 120);
-            this.labChecked.Name = "labChecked";
-            this.labChecked.Size = new System.Drawing.Size(191, 28);
-            this.labChecked.TabIndex = 7;
-            this.labChecked.Text = "Last Checked: N/A";
-            // 
-            // labUpdated
-            // 
-            this.labUpdated.AutoSize = true;
-            this.labUpdated.Location = new System.Drawing.Point(292, 158);
-            this.labUpdated.Name = "labUpdated";
-            this.labUpdated.Size = new System.Drawing.Size(190, 28);
-            this.labUpdated.TabIndex = 8;
-            this.labUpdated.Text = "Last Updated: N/A";
+            this.progressTotal.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(50)))), ((int)(((byte)(50)))));
+            this.progressTotal.BorderRadius = 5;
+            this.progressTotal.Location = new System.Drawing.Point(297, 408);
+            this.progressTotal.Margin = new System.Windows.Forms.Padding(5, 7, 5, 7);
+            this.progressTotal.MaximumValue = 100;
+            this.progressTotal.Name = "progressTotal";
+            this.progressTotal.ProgressColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.progressTotal.Size = new System.Drawing.Size(346, 31);
+            this.progressTotal.TabIndex = 10;
+            this.progressTotal.Value = 50;
             // 
             // btnUpdate
             // 
@@ -187,18 +142,78 @@
             this.btnUpdate.TabIndex = 9;
             this.btnUpdate.Click += new System.EventHandler(this.btnUpdate_Click);
             // 
-            // bunifuProgressBar1
+            // labUpdated
             // 
-            this.bunifuProgressBar1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(50)))), ((int)(((byte)(50)))));
-            this.bunifuProgressBar1.BorderRadius = 5;
-            this.bunifuProgressBar1.Location = new System.Drawing.Point(297, 408);
-            this.bunifuProgressBar1.Margin = new System.Windows.Forms.Padding(5, 7, 5, 7);
-            this.bunifuProgressBar1.MaximumValue = 100;
-            this.bunifuProgressBar1.Name = "bunifuProgressBar1";
-            this.bunifuProgressBar1.ProgressColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.bunifuProgressBar1.Size = new System.Drawing.Size(346, 31);
-            this.bunifuProgressBar1.TabIndex = 10;
-            this.bunifuProgressBar1.Value = 50;
+            this.labUpdated.AutoSize = true;
+            this.labUpdated.Location = new System.Drawing.Point(292, 158);
+            this.labUpdated.Name = "labUpdated";
+            this.labUpdated.Size = new System.Drawing.Size(190, 28);
+            this.labUpdated.TabIndex = 8;
+            this.labUpdated.Text = "Last Updated: N/A";
+            // 
+            // labChecked
+            // 
+            this.labChecked.AutoSize = true;
+            this.labChecked.Location = new System.Drawing.Point(292, 120);
+            this.labChecked.Name = "labChecked";
+            this.labChecked.Size = new System.Drawing.Size(191, 28);
+            this.labChecked.TabIndex = 7;
+            this.labChecked.Text = "Last Checked: N/A";
+            // 
+            // labName
+            // 
+            this.labName.AutoSize = true;
+            this.labName.Location = new System.Drawing.Point(292, 82);
+            this.labName.Name = "labName";
+            this.labName.Size = new System.Drawing.Size(119, 28);
+            this.labName.TabIndex = 6;
+            this.labName.Text = "Name: N/A";
+            // 
+            // listRepo
+            // 
+            this.listRepo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(50)))), ((int)(((byte)(50)))));
+            this.listRepo.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.listRepo.ForeColor = System.Drawing.Color.White;
+            this.listRepo.FormattingEnabled = true;
+            this.listRepo.ItemHeight = 28;
+            this.listRepo.Location = new System.Drawing.Point(11, 82);
+            this.listRepo.Name = "listRepo";
+            this.listRepo.Size = new System.Drawing.Size(275, 420);
+            this.listRepo.TabIndex = 5;
+            this.listRepo.SelectedIndexChanged += new System.EventHandler(this.listRepo_SelectedIndexChanged);
+            // 
+            // btnNewRepo
+            // 
+            this.btnNewRepo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.btnNewRepo.color = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.btnNewRepo.colorActive = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
+            this.btnNewRepo.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnNewRepo.Font = new System.Drawing.Font("Lucida Grande", 11F);
+            this.btnNewRepo.ForeColor = System.Drawing.Color.White;
+            this.btnNewRepo.Image = null;
+            this.btnNewRepo.ImagePosition = 0;
+            this.btnNewRepo.ImageZoom = 0;
+            this.btnNewRepo.LabelPosition = 40;
+            this.btnNewRepo.LabelText = "New Repo";
+            this.btnNewRepo.Location = new System.Drawing.Point(11, 20);
+            this.btnNewRepo.Margin = new System.Windows.Forms.Padding(0);
+            this.btnNewRepo.Name = "btnNewRepo";
+            this.btnNewRepo.Size = new System.Drawing.Size(275, 47);
+            this.btnNewRepo.TabIndex = 4;
+            this.btnNewRepo.Click += new System.EventHandler(this.btnNewRepo_Click);
+            // 
+            // progressFile
+            // 
+            this.progressFile.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(50)))), ((int)(((byte)(50)))));
+            this.progressFile.BorderRadius = 5;
+            this.progressFile.Location = new System.Drawing.Point(297, 362);
+            this.progressFile.Margin = new System.Windows.Forms.Padding(7, 10, 7, 10);
+            this.progressFile.MaximumValue = 100;
+            this.progressFile.Name = "progressFile";
+            this.progressFile.ProgressColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.progressFile.Size = new System.Drawing.Size(346, 31);
+            this.progressFile.TabIndex = 11;
+            this.progressFile.Value = 50;
             // 
             // HastyForm
             // 
@@ -236,9 +251,10 @@
         private System.Windows.Forms.ListBox listRepo;
         private System.Windows.Forms.Label labChecked;
         private System.Windows.Forms.Label labName;
-        private Bunifu.Framework.UI.BunifuProgressBar bunifuProgressBar1;
+        private Bunifu.Framework.UI.BunifuProgressBar progressTotal;
         private Bunifu.Framework.UI.BunifuTileButton btnUpdate;
         private System.Windows.Forms.Label labUpdated;
+        private Bunifu.Framework.UI.BunifuProgressBar progressFile;
     }
 }
 

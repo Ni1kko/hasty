@@ -21,6 +21,18 @@ namespace Hasty {
                 return;
 
 
+            string path = txtPath.Text;
+
+            if (string.IsNullOrWhiteSpace(path)) {
+                MessageBox.Show("You must provide an installation path for the mods", "Invalid path", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return;
+            }
+
+            if (!Directory.Exists(path)) {
+                MessageBox.Show("Invalid folder path: " + path, "Invalid path", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return;
+            }
+
             Tuple<Repo, Exception> urlResult = await Web.ReadUrlAsync(url);
 
             Repo repo = urlResult.Item1;

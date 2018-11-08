@@ -60,6 +60,7 @@
     <Compile Include="AddRepo.Designer.cs">
       <DependentUpon>AddRepo.cs</DependentUpon>
     </Compile>
+    <Compile Include="Ascii85.cs" />
     <Compile Include="Hasty.cs">
       <SubType>Form</SubType>
     </Compile>
