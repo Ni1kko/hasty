@@ -14,6 +14,12 @@ namespace HastyServer {
         static int _port = 6969;
         static int _bufferSize = 10240;
 
+        public static int BufferSize {
+            get {
+                return _bufferSize;
+            };
+        }
+
         private static void HandleClient(object clientObj) {
             try { 
             TcpClient client = (TcpClient)clientObj;
@@ -63,7 +69,7 @@ namespace HastyServer {
                             sendingBuffer = new byte[CurrentPacketLength];
                             fileStream.Read(sendingBuffer, 0, CurrentPacketLength);
                             stream.Write(sendingBuffer, 0, (int)sendingBuffer.Length);
-
+                            Thread.Sleep(1);
                         }
 
                         fileStream.Close();
@@ -77,6 +83,27 @@ namespace HastyServer {
         }
 
         public static void StartListener() {
+
+            Settings settings = Settings.ReadSettings();
+
+            // dank maths (50 mbits)
+            int maxSpeed = settings.MaxSpeed;
+
+            if (maxSpeed <= 0)
+            {
+                // cap to 10 megbytes a sec by default (80 mbits)
+                _bufferSize = 10240;
+            }
+            else
+            {
+                maxSpeed *= 1000000; // mbits to bits
+                maxSpeed /= 8; // bits to bytes
+                               // 50 * 1 000 000, / 8, = 6 250 000
+                _bufferSize = maxSpeed / 1000; // devivded by 1000 because 1000 packets a sec
+            }
+        
+
+
             TcpListener listener = new TcpListener(IPAddress.Any, _port);
             listener.Start();
 

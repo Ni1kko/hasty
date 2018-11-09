@@ -9,10 +9,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Security.Cryptography;
-using FubarDev.FtpServer;
-using FubarDev.FtpServer.FileSystem.DotNet;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace HastyServer {
 
@@ -75,6 +75,7 @@ namespace HastyServer {
 
         static Thread updateThread = null;
         static DynatreeItem di;
+        static string modFolder = "mod";
 
         private static void OnFileChange(object source, FileSystemEventArgs e) {
             Console.WriteLine("File: " + e.FullPath + " was changed: " + e.ChangeType);
@@ -96,7 +97,7 @@ namespace HastyServer {
 
                         sleepAgain = true;
                         Console.WriteLine("Generating new file hashes...");
-                        di = new DynatreeItem(new DirectoryInfo("mod"), true);
+                        di = new DynatreeItem(new DirectoryInfo(modFolder), true);
 
                         Console.WriteLine("New hashes generated...");
                     }
@@ -110,20 +111,24 @@ namespace HastyServer {
 
         static void Main(string[] args) {
 
+            Settings s = Settings.ReadSettings();
+            modFolder = s.ModFolder;
+
+
             if (!File.Exists("repo.json")) {
                 Console.WriteLine("Unable to start Hasty server, repo.json is missing");
                 Console.ReadLine();
                 return;
             }
 
-            if (!Directory.Exists("mod")) {
+            if (!Directory.Exists(modFolder)) {
                 Console.WriteLine("Unable to start Hasty server, mod folder is not configured/does not exist");
                 Console.ReadLine();
                 return;
             }
 
             FileSystemWatcher watcher = new FileSystemWatcher();
-            watcher.Path = "mod";
+            watcher.Path = modFolder;
             watcher.IncludeSubdirectories = true;
 
             watcher.Changed += new FileSystemEventHandler(OnFileChange);
@@ -133,7 +138,7 @@ namespace HastyServer {
 
 
             Console.WriteLine("Generating file hashes...");
-            di = new DynatreeItem(new DirectoryInfo("mod"));
+            di = new DynatreeItem(new DirectoryInfo(modFolder));
 
             Console.WriteLine("Hashes generated...");
 
@@ -147,10 +152,12 @@ namespace HastyServer {
                 using (var writer = new StreamWriter(e.Response.OutputStream)) {
                     
                     if (path == "/" || path == "/repo.json") {
-                        writer.Write(File.ReadAllText("repo.json"));
+                        JObject json = JObject.Parse(File.ReadAllText("repo.json"));
+                        json.Add("buffer_size", TcpCommunication.BufferSize);
+                        writer.Write(json.ToString());
                     } else if (path == "/mod") {
 
-                        int files = Directory.GetFiles("mod", "*", SearchOption.AllDirectories).Length;
+                        int files = Directory.GetFiles(modFolder, "*", SearchOption.AllDirectories).Length;
                         di.totalFiles = files;
                         string result = di.DynatreeToJson();
                         writer.Write(result);

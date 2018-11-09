@@ -41,15 +41,6 @@
     <Reference Include="FubarDev.FtpServer, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\FubarDev.FtpServer.2.1.0\lib\net461\FubarDev.FtpServer.dll</HintPath>
     </Reference>
-    <Reference Include="FubarDev.FtpServer.Abstractions, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\FubarDev.FtpServer.Abstractions.2.1.0\lib\net461\FubarDev.FtpServer.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="FubarDev.FtpServer.Commands, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\FubarDev.FtpServer.Commands.2.1.0\lib\net461\FubarDev.FtpServer.Commands.dll</HintPath>
-    </Reference>
-    <Reference Include="FubarDev.FtpServer.FileSystem.DotNet, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\FubarDev.FtpServer.FileSystem.DotNet.2.1.0\lib\net461\FubarDev.FtpServer.FileSystem.DotNet.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.DotNet.PlatformAbstractions, Version=1.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.DotNet.PlatformAbstractions.1.1.0\lib\net451\Microsoft.DotNet.PlatformAbstractions.dll</HintPath>
     </Reference>
