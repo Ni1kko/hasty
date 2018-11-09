@@ -114,11 +114,13 @@ namespace Hasty {
             return ret;
         }
 
-        public static string CheckSum(string filePath) {
-            using (var inputStream = File.Open(filePath, FileMode.Open)) {
-                var md5 = MD5.Create();
-                return Convert.ToBase64String(md5.ComputeHash(inputStream));
-            }
+        public static async Task<string> CheckSum(string filePath) {
+            return await Task.Run(() => {
+                using (var inputStream = File.Open(filePath, FileMode.Open)) {
+                    var md5 = MD5.Create();
+                    return Convert.ToBase64String(md5.ComputeHash(inputStream));
+                }
+            });
         }
     }
 }

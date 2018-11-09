@@ -94,23 +94,29 @@ namespace Hasty {
             UpdateSelected(index);
         }
 
+        private void ButtonsEnable(bool enable) {
+            btnUpdate.Enabled = enable;
+            btnRemove.Enabled = enable;
+            btnNewRepo.Enabled = enable;
+        }
+
         int _filesHandled = 0, _totalFiles = 0;
         int _updated = 0;
         private async void btnUpdate_Click(object sender, EventArgs e) {
             if (_selected == null)
                 return;
 
-            btnUpdate.Enabled = false;
-            btnRemove.Enabled = false;
-            btnNewRepo.Enabled = false;
+            ButtonsEnable(false);
 
             Tuple<Repo, Exception> res = await Web.ReadUrlAsync(_selected.Url);
             Repo repo = res.Item1;
             if (repo == null) {
                 MessageBox.Show("Error updating repository: " + res.Item2.Message, "An error occured :(", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ButtonsEnable(true);
                 return;
             }
-             
+
+            TcpData.BufferSize = repo.BufferSize;
 
             if (repo != _selected) {
                 repo.LastCheck = Misc.UnixTime;
@@ -131,6 +137,7 @@ namespace Hasty {
             DynatreeItem files = filesResponse.Item1;
             if (files == null) {
                 MessageBox.Show("Error downloading repository info: " + filesResponse.Item2.Message, "An error occured :(", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ButtonsEnable(true);
                 return;
             }
 
@@ -140,27 +147,27 @@ namespace Hasty {
             progressTotal.Visible = true;
             progressFile.Visible = true;
             labCurrentFile.Visible = true;
+            labProcessed.Visible = true;
 
             bool success = await WalkFolder(repo, files);
 
             if (_updated > 0 && success) {
-               
+
                 bool removed = _repos.Remove(_selected);
                 repo.LastUpdate = Misc.UnixTime;
                 _repos.Add(repo);
 
                 Files.UpdateRepos(_repos);
                 UpdateRepos();
-
                 MessageBox.Show($"Updating files finished.\nTotal files checked: {_totalFiles}, files updated: {_updated}", "Update Finished", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 _updated = 0;
-            } else {
+            } else if (!success) {
+                MessageBox.Show($"Failed to update repository", "Update Failed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            } else { 
                 MessageBox.Show("No new updates found.", "Update Finished", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
-            btnUpdate.Enabled = true;
-            btnRemove.Enabled = true;
-            btnNewRepo.Enabled = true;
+            ButtonsEnable(true);
 
         }
 
@@ -185,7 +192,8 @@ namespace Hasty {
                         Directory.CreateDirectory(repoFolder + "/" + folderPath);
 
 
-                   await WalkFolder(repo, item, folderPath);
+                    if (!await WalkFolder(repo, item, folderPath))
+                        return false;
                 } else {
                     string remotePath = path + "/" + item.title;
                     string filePath = repoFolder + "/" + remotePath;
@@ -195,31 +203,47 @@ namespace Hasty {
                     float totalValue = (((float)_filesHandled / (float)_totalFiles) * 100);
                     progressTotal.Value = (int)totalValue;
 
+                    string fileTitle = item.title;
+                    if (fileTitle.Length > 18)
+                        fileTitle = fileTitle.Substring(0, 18) + "...";
+                    labCurrentFile.Text = "Current File: " + fileTitle;
 
                     if (File.Exists(filePath)) {
-                        string checkSum = Files.CheckSum(filePath);
+                        string checkSum = await Files.CheckSum(filePath);
                         if (checkSum == item.hash) {
-                            labProcessed.Text = $"Files Processed: {_filesHandled}/{_totalFiles} (100%)";
+                            labProcessed.Text = $"Processed: {_filesHandled}/{_totalFiles} (100%)";
                             continue;
                         }
                     }
 
                     _updated++;
-                    labCurrentFile.Text = "Current File: " + item.title;
+                    int lastPercent = 0;
 
-                    //filePath = filePath.Replace("//", "/");
-                    await TcpData.RequestFile(repo, remotePath, filePath, (long progress) => {
-                        float percCompleted = (((float)progress / (float)item.fileSize) * 100);
-                        progressFile.Value = (int)percCompleted;
+                    bool res = await Task.Run(async () => {
+                        bool result = await TcpData.RequestFile(repo, remotePath, filePath, (long progress, double speed) => {
+                            int percCompleted = (int)(((float)progress / (float)item.fileSize) * 100);
 
-                        labProcessed.Visible = true;
-                        labProcessed.Text = $"Files Processed: {_filesHandled}/{_totalFiles} ({(int)percCompleted}%)";
+                            if (percCompleted <= lastPercent)
+                                return;
+
+                            lastPercent = percCompleted;
+
+                            speed /= 1000;
+
+                            Invoke((MethodInvoker)delegate {
+                                progressFile.Value = (int)percCompleted;
+
+                                if (speed != 0)
+                                    labProcessed.Text = $"Files Processed: {_filesHandled}/{_totalFiles} ({(int)percCompleted}%, {Math.Round(speed, 1)} MB/s)";
+                            });
+                        });
+                        return result;
                     });
 
+                    
+                    if (!res)
+                        return false;
 
-                    //await Web.DownloadFile(repo.RemoteFolder + remotePath, filePath, (double percent) => {
-                    //    progressFile.Value = (int)percent;
-                    //});
                 }
             }
             return true;

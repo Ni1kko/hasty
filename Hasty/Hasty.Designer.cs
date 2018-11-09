@@ -28,6 +28,7 @@
             this.btnExit = new System.Windows.Forms.Button();
             this.labTitle = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.labCurrentFile = new System.Windows.Forms.Label();
             this.btnRemove = new Bunifu.Framework.UI.BunifuTileButton();
             this.labProcessed = new System.Windows.Forms.Label();
             this.progressFile = new Bunifu.Framework.UI.BunifuProgressBar();
@@ -38,7 +39,6 @@
             this.labName = new System.Windows.Forms.Label();
             this.listRepo = new System.Windows.Forms.ListBox();
             this.btnNewRepo = new Bunifu.Framework.UI.BunifuTileButton();
-            this.labCurrentFile = new System.Windows.Forms.Label();
             this.topBar.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -115,6 +115,17 @@
             this.panel1.Size = new System.Drawing.Size(656, 529);
             this.panel1.TabIndex = 2;
             // 
+            // labCurrentFile
+            // 
+            this.labCurrentFile.AutoSize = true;
+            this.labCurrentFile.Font = new System.Drawing.Font("Lucida Grande", 9F);
+            this.labCurrentFile.Location = new System.Drawing.Point(292, 288);
+            this.labCurrentFile.Name = "labCurrentFile";
+            this.labCurrentFile.Size = new System.Drawing.Size(159, 25);
+            this.labCurrentFile.TabIndex = 14;
+            this.labCurrentFile.Text = "Current File: N/A";
+            this.labCurrentFile.Visible = false;
+            // 
             // btnRemove
             // 
             this.btnRemove.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
@@ -138,9 +149,10 @@
             // labProcessed
             // 
             this.labProcessed.AutoSize = true;
-            this.labProcessed.Location = new System.Drawing.Point(292, 251);
+            this.labProcessed.Font = new System.Drawing.Font("Lucida Grande", 9F);
+            this.labProcessed.Location = new System.Drawing.Point(292, 257);
             this.labProcessed.Name = "labProcessed";
-            this.labProcessed.Size = new System.Drawing.Size(206, 28);
+            this.labProcessed.Size = new System.Drawing.Size(186, 25);
             this.labProcessed.TabIndex = 12;
             this.labProcessed.Text = "Files Processed: 0/0";
             this.labProcessed.Visible = false;
@@ -253,16 +265,6 @@
             this.btnNewRepo.TabIndex = 4;
             this.btnNewRepo.Click += new System.EventHandler(this.btnNewRepo_Click);
             // 
-            // labCurrentFile
-            // 
-            this.labCurrentFile.AutoSize = true;
-            this.labCurrentFile.Location = new System.Drawing.Point(292, 288);
-            this.labCurrentFile.Name = "labCurrentFile";
-            this.labCurrentFile.Size = new System.Drawing.Size(175, 28);
-            this.labCurrentFile.TabIndex = 14;
-            this.labCurrentFile.Text = "Current File: N/A";
-            this.labCurrentFile.Visible = false;
-            // 
             // HastyForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 28F);
@@ -271,7 +273,6 @@
             this.ClientSize = new System.Drawing.Size(651, 567);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.topBar);
-            this.DoubleBuffered = true;
             this.Font = new System.Drawing.Font("Lucida Grande", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ForeColor = System.Drawing.SystemColors.Control;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;

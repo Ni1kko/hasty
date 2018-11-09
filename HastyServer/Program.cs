@@ -111,8 +111,8 @@ namespace HastyServer {
 
         static void Main(string[] args) {
 
-            Settings s = Settings.ReadSettings();
-            modFolder = s.ModFolder;
+            Settings settings = Settings.ReadSettings();
+            modFolder = settings.ModFolder;
 
 
             if (!File.Exists("repo.json")) {
@@ -153,7 +153,7 @@ namespace HastyServer {
                     
                     if (path == "/" || path == "/repo.json") {
                         JObject json = JObject.Parse(File.ReadAllText("repo.json"));
-                        json.Add("buffer_size", TcpCommunication.BufferSize);
+                        json.Add("BufferSize", TcpCommunication.BufferSize);
                         writer.Write(json.ToString());
                     } else if (path == "/mod") {
 

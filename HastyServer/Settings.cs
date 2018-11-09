@@ -18,7 +18,7 @@ namespace HastyServer
 
         public static Settings ReadSettings()
         {
-            if (!File.Exists("setting.json"))
+            if (!File.Exists("settings.json"))
             {
                 SetSettings(DefaultSettings());
             }

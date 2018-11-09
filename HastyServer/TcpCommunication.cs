@@ -12,21 +12,21 @@ namespace HastyServer {
     class TcpCommunication {
 
         static int _port = 6969;
-        static int _bufferSize = 10240;
+        static int _clientsConnected = 0;
+        static FileStorage _fileStorage = new FileStorage();
 
-        public static int BufferSize {
-            get {
-                return _bufferSize;
-            };
-        }
+        public static int BufferSize { get; private set; } = 10240;
 
         private static void HandleClient(object clientObj) {
             try { 
-            TcpClient client = (TcpClient)clientObj;
 
-            NetworkStream stream = client.GetStream();
+                TcpClient client = (TcpClient)clientObj;
 
-            byte[] sendingBuffer = null;
+                NetworkStream stream = client.GetStream();
+
+                _clientsConnected++;
+
+                byte[] sendingBuffer = null;
 
                 if (stream.CanRead) {
                     byte[] buff = new byte[512];
@@ -53,14 +53,14 @@ namespace HastyServer {
                             return;
                         }
 
-                        FileStream fileStream = new FileStream(file, FileMode.Open, FileAccess.Read);
+                        Stream fileStream = _fileStorage.ReadFile(file);
 
-                        int NoOfPackets = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(fileStream.Length) / Convert.ToDouble(_bufferSize)));
+                        int NoOfPackets = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(fileStream.Length) / Convert.ToDouble(BufferSize)));
                         int TotalLength = (int)fileStream.Length, CurrentPacketLength;
 
                         for (int i = 0; i < NoOfPackets; i++) {
-                            if (TotalLength > _bufferSize) {
-                                CurrentPacketLength = _bufferSize;
+                            if (TotalLength > BufferSize) {
+                                CurrentPacketLength = BufferSize;
                                 TotalLength = TotalLength - CurrentPacketLength;
                             } else
                                 CurrentPacketLength = TotalLength;
@@ -75,10 +75,12 @@ namespace HastyServer {
                         fileStream.Close();
                         stream.Close();
                         client.Close();
+                        _clientsConnected--;
                     }
                 }
             }catch (Exception ex) {
                 Console.WriteLine("Client exception: " + ex);
+                _clientsConnected--;
             }
         }
 
@@ -92,14 +94,14 @@ namespace HastyServer {
             if (maxSpeed <= 0)
             {
                 // cap to 10 megbytes a sec by default (80 mbits)
-                _bufferSize = 10240;
+                BufferSize = 10240;
             }
             else
             {
                 maxSpeed *= 1000000; // mbits to bits
                 maxSpeed /= 8; // bits to bytes
                                // 50 * 1 000 000, / 8, = 6 250 000
-                _bufferSize = maxSpeed / 1000; // devivded by 1000 because 1000 packets a sec
+                BufferSize = maxSpeed / 1000; // devivded by 1000 because 1000 packets a sec
             }
         
 

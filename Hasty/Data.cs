@@ -15,6 +15,7 @@ namespace Hasty {
         public string FolderName;
         public int LastCheck;
         public int LastUpdate;
+        public int BufferSize;
         public string Folder;
     }
 

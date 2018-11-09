@@ -8,15 +8,18 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace Hasty {
     class TcpData {
-        static int _bufferSize = 10240;
+        public static int BufferSize { get; set; } = 10240;
         static int _port = 6969;
 
-        public static async Task<bool> RequestFile(Repo repo, string file, string savePath, Action<long> progress = null) {
-            byte[] recData = new byte[_bufferSize];
+        public static async Task<bool> RequestFile(Repo repo, string file, string savePath, Action<long, double> progress = null) {
+            byte[] recData = new byte[BufferSize];
             int recBytes;
+
+            Stopwatch stopWatch = new Stopwatch();
 
             try {
                 TcpClient client = new TcpClient(repo.SocketConnection, _port);
@@ -30,15 +33,25 @@ namespace Hasty {
 
                 long totalrecbytes = 0;
                 FileStream fileStream = new FileStream(savePath, FileMode.OpenOrCreate, FileAccess.Write);
-                while ((recBytes = await stream.ReadAsync(recData, 0, recData.Length)) > 0) {
+                do {
+                    stopWatch.Reset();
+                    stopWatch.Start();
+
+                    recBytes = await stream.ReadAsync(recData, 0, recData.Length);
+                    Thread.Sleep(1);
+
+                    stopWatch.Stop();
+
                     await fileStream.WriteAsync(recData, 0, recBytes);
                     totalrecbytes += recBytes;
 
                     if (progress != null) {
-                        progress(totalrecbytes);
+                        double milliSeconds = stopWatch.ElapsedMilliseconds;
+                        double speed = recBytes / milliSeconds;
+                        progress(totalrecbytes, speed);
                     }
-                    Thread.Sleep(1);
-                }
+                } while ((recBytes) > 0);
+
                 fileStream.Close();
                 stream.Close();
                 client.Close();
@@ -50,51 +63,5 @@ namespace Hasty {
             }
         }
 
-        //public static void ReceiveTCP() {
-        //    TcpListener Listener = null;
-        //    try {
-        //        Listener = new TcpListener(IPAddress.Any, _port);
-        //        Listener.Start();
-        //    } catch (Exception ex) {
-        //        Console.WriteLine(ex.Message);
-        //    }
-
-            
-
-        //    for (; ; )
-        //    {
-        //        TcpClient client = null;
-        //        NetworkStream netstream = null;
-        //        try {
-
-        //            if (Listener.Pending()) {
-        //                client = Listener.AcceptTcpClient();
-        //                netstream = client.GetStream();
-
-        //                Console.WriteLine("Starting to receive file...");
-
-        //                string SaveFileName = string.Empty;
-
-        //                SaveFileName = @"C:\Users\eelis\Documents\GitHub\hasty\HastyServer\bin\Debug\test\largefile.dat";
-
-        //                int totalrecbytes = 0;
-        //                FileStream Fs = new FileStream(SaveFileName, FileMode.OpenOrCreate, FileAccess.Write);
-        //                while ((RecBytes = netstream.Read(RecData, 0, RecData.Length)) > 0) {
-        //                    Fs.Write(RecData, 0, RecBytes);
-        //                    totalrecbytes += RecBytes;
-        //                }
-        //                Fs.Close();
-
-        //                netstream.Close();
-        //                client.Close();
-
-        //            } else
-        //                Thread.Sleep(50);
-        //        } catch (Exception ex) {
-        //            Console.WriteLine(ex.Message);
-        //            //netstream.Close();
-        //        }
-        //    }
-        //}
     }
 }
