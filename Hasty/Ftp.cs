@@ -1,9 +1,9 @@
-﻿using System;
+﻿using FluentFTP;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,63 +13,33 @@ namespace Hasty {
     class Ftp {
         public static bool Cancel { get; set; } = false;
         public static async Task<bool> RequestFile(Repo repo, string file, string savePath, long fileLength, Action<long> progress = null) {
-
-            RestartDownload:
-
             try {
+                if (Cancel)
+                    return false;
+
                 string ftpUrl = repo.SocketConnection;
-                if (!ftpUrl.StartsWith("ftp://"))
-                    ftpUrl = "ftp://" + ftpUrl;
+                if (ftpUrl.StartsWith("ftp://"))
+                    ftpUrl = ftpUrl.Replace("ftp://", "");
 
-                FtpWebRequest ftp = (FtpWebRequest)WebRequest.Create(ftpUrl + "/" + file);
-                ftp.Method = WebRequestMethods.Ftp.DownloadFile;
+                ftpUrl = ftpUrl.Replace("/", "");
 
-                ftp.Credentials = new NetworkCredential("anonymous", "");
-                FtpWebResponse res;
+                string[] parts = ftpUrl.Split(':');
+                if (parts.Length != 2)
+                    throw new Exception("Invalid IP, port number not defined or is incorrect: " + ftpUrl);
 
-                try {
-                    res = (FtpWebResponse)ftp.GetResponse();
-                }
-                catch {
-                    // timeout, this is gonna be true aids
-                    goto RestartDownload;
-                }
+                FtpClient client = new FtpClient(parts[0], int.Parse(parts[1]), "anonymous", "");
 
-                Stream stream = res.GetResponseStream();
-                
+                await client.ConnectAsync();
 
-                FileStream fileStream = new FileStream(savePath, FileMode.OpenOrCreate, FileAccess.Write);
+                await client.DownloadFileAsync(savePath, file, true, FtpVerify.None, new Progress<double>(async x => {
+                    progress((long)x);
 
-                int chunkSize = 20480;
-                long streamPosition = 0;
-                while (true) {
-                    byte[] buffer = new byte[Math.Min(chunkSize, fileLength - streamPosition)];
-
-                    int readBytes = await stream.ReadAsync(buffer, 0, buffer.Length);
-
-                    if (readBytes == 0)
-                        break;
-
-                    streamPosition += readBytes; // for tracking response stream position
-
-                    fileStream.Write(buffer, 0, readBytes);
-
-                    if (progress != null) {
-                        progress(streamPosition);
-                    }
                     if (Cancel) {
-                        stream.Close();
-                        fileStream.Close();
-                        return false;
+                        await client.DisconnectAsync();
                     }
-                }
+                }));
 
 
-
-                //await stream.CopyToAsync(fileStream);
-
-                stream.Close();
-                fileStream.Close();
             } catch (Exception ex) {
                 MessageBox.Show("File download failed: " + ex, "An error occured :(", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;

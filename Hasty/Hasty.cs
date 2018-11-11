@@ -252,7 +252,7 @@ namespace Hasty {
                     Thread t = new Thread(async (object thread) => {
                         _activeThreads++;
                         bool result = await Ftp.RequestFile(repo, remotePath, filePath, item.fileSize, (long progress) => {
-                            int percCompleted = (int)(((float)progress / (float)item.fileSize) * 100);
+                            int percCompleted = (int)progress;
 
                             if (percCompleted <= lastPercent)
                                 return;
@@ -265,7 +265,7 @@ namespace Hasty {
                                 labProcessed.Text = $"Processed: {_filesHandled}/{_totalFiles} (Active: {_progresses.Count})";
 
                                 string tip = "";
-                                foreach (KeyValuePair<string, double> kv in _progresses) {
+                                foreach (KeyValuePair<string, double> kv in _progresses.ToList()) {
                                     tip += Path.GetFileName(kv.Key) + ": " + kv.Value + "%\n";
                                 }
 
