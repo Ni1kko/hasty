@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,8 @@ namespace HastyServer {
                     foreach (string s in files) {
                         byte[] buf = File.ReadAllBytes(s);
 
+
+                        // techically could fit more files in, but cba to implement more logic
                         if (buf.Length + totalBytesUsed > megs * 1000000)
                             break;
 
@@ -43,7 +46,8 @@ namespace HastyServer {
                 MemoryStream ms = new MemoryStream(_cache[fi.FullName]);
                 return ms;
             } else {
-                return new FileStream(fi.FullName, FileMode.Open, FileAccess.Read);
+                FileStream fs = new FileStream(fi.FullName, FileMode.Open, FileAccess.Read);
+                return fs;
             }
         }
     }

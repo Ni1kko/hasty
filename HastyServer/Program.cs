@@ -1,23 +1,20 @@
-﻿using NHttp;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using NHttp;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
 using System.Security.Cryptography;
-using Microsoft.Extensions.DependencyInjection;
 using System.Threading;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace HastyServer {
 
     class TreeCache {
         public static Dictionary<string, string> hashes = new Dictionary<string, string>();
+        public static int totalFiles = 0;
+        public static int processedFiles = 0;
     }
 
     class DynatreeItem {
@@ -29,28 +26,51 @@ namespace HastyServer {
         public int totalFiles;
 
         public DynatreeItem(FileSystemInfo fsi, bool refresh = false) {
-            if (refresh)
-                TreeCache.hashes.Clear();
-
-            title = fsi.Name;
-            children = new List<DynatreeItem>();
-
-            if (fsi.Attributes == FileAttributes.Directory) {
-                isFolder = true;
-                foreach (FileSystemInfo f in (fsi as DirectoryInfo).GetFileSystemInfos()) {
-                    children.Add(new DynatreeItem(f));
+            try {
+                if (refresh) {
+                    TreeCache.hashes.Clear();
+                    TreeCache.totalFiles = 0;
                 }
-                hash = "";
-            } else {
-                isFolder = false;
-                fileSize = new FileInfo(fsi.FullName).Length;
-                if (TreeCache.hashes.ContainsKey(fsi.FullName)) {
-                    hash = TreeCache.hashes[fsi.FullName];
+
+                if (TreeCache.totalFiles == 0) {
+                    try {
+                        //Console.WriteLine(fsi.FullName);
+                        int allFiles = Directory.GetFiles(fsi.FullName, "*", SearchOption.AllDirectories).Length;
+                        TreeCache.totalFiles = allFiles;
+                    }
+                    catch {
+                    }
+                }
+
+
+                TreeCache.processedFiles++;
+
+                Console.Write($"\rHashed files: {TreeCache.processedFiles}/{TreeCache.totalFiles}");
+
+                title = fsi.Name;
+                children = new List<DynatreeItem>();
+
+                if (fsi.Attributes == FileAttributes.Directory) {
+                    isFolder = true;
+                    foreach (FileSystemInfo f in (fsi as DirectoryInfo).GetFileSystemInfos()) {
+                        children.Add(new DynatreeItem(f, refresh));
+                    }
+                    hash = "";
                 } else {
-                    hash = CheckSum(fsi.FullName);
-                    TreeCache.hashes[fsi.FullName] = hash;
+
+                    isFolder = false;
+                    fileSize = new FileInfo(fsi.FullName).Length;
+                    if (TreeCache.hashes.ContainsKey(fsi.FullName)) {
+                        hash = TreeCache.hashes[fsi.FullName];
+                    } else {
+                        hash = CheckSum(fsi.FullName);
+                        TreeCache.hashes[fsi.FullName] = hash;
+                    }
+
                 }
-                
+            }
+            catch(Exception ex) {
+                Console.WriteLine("File tree exception: " + ex.Message);
             }
             
         }
@@ -96,10 +116,10 @@ namespace HastyServer {
                         }
 
                         sleepAgain = true;
-                        Console.WriteLine("Generating new file hashes...");
+                        Console.WriteLine("Generating new file hashes..");
                         di = new DynatreeItem(new DirectoryInfo(modFolder), true);
 
-                        Console.WriteLine("New hashes generated...");
+                        Console.WriteLine("\nNew hashes generated...");
                     }
                     catch { }
                 });
@@ -135,14 +155,21 @@ namespace HastyServer {
             watcher.Created += new FileSystemEventHandler(OnFileChange);
 
             watcher.EnableRaisingEvents = true;
-
+            
 
             Console.WriteLine("Generating file hashes...");
-            di = new DynatreeItem(new DirectoryInfo(modFolder));
+            
+            DirectoryInfo dirInfo = new DirectoryInfo(modFolder);
+            di = new DynatreeItem(dirInfo);
 
-            Console.WriteLine("Hashes generated...");
+            Console.WriteLine("\nHashes generated...");
 
-            new Thread(TcpCommunication.StartListener).Start();
+            //new Thread(TcpCommunication.StartListener).Start();
+            if (!Ftp.Init())
+                Console.WriteLine("Failed to init FTP");
+
+            if (!Ftp.Start())
+                Console.WriteLine("Failed to start FTP");
 
             HttpServer server = new HttpServer();
             server.RequestReceived += (s, e) => {
@@ -169,7 +196,7 @@ namespace HastyServer {
                 }
             };
 
-            server.EndPoint = new IPEndPoint(IPAddress.Loopback, 80);
+            server.EndPoint = new IPEndPoint(IPAddress.Any, 8090);
 
             server.Start();
             

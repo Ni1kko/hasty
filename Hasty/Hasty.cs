@@ -15,6 +15,7 @@ namespace Hasty {
 
         List<Repo> _repos = new List<Repo>();
         Repo _selected = null;
+        int _selectedIndex = 0;
 
         public HastyForm() {
             InitializeComponent();
@@ -39,8 +40,8 @@ namespace Hasty {
                         listRepo.Items.Add(r.Name);
                     }
 
-                    listRepo.SelectedIndex = 0;
-                    UpdateSelected();
+                    listRepo.SelectedIndex = _selectedIndex;
+                    UpdateSelected(_selectedIndex);
                 }
             }
             catch(Exception ex) {
@@ -91,7 +92,9 @@ namespace Hasty {
             if (index == -1 || index >= _repos.Count)
                 return;
 
-            UpdateSelected(index);
+            _selectedIndex = index;
+
+            UpdateSelected(_selectedIndex);
         }
 
         private void ButtonsEnable(bool enable) {
@@ -124,8 +127,8 @@ namespace Hasty {
 
                 repo = Files.Update(_selected, repo);
 
-                _repos.Remove(_selected);
-                _repos.Add(repo);
+                int index = _repos.IndexOf(_selected);
+                _repos[index] = repo;
 
                 Files.UpdateRepos(_repos);
                 UpdateRepos();
@@ -145,7 +148,6 @@ namespace Hasty {
             _totalFiles = files.totalFiles;
 
             progressTotal.Visible = true;
-            progressFile.Visible = true;
             labCurrentFile.Visible = true;
             labProcessed.Visible = true;
 
@@ -153,9 +155,9 @@ namespace Hasty {
 
             if (_updated > 0 && success) {
 
-                bool removed = _repos.Remove(_selected);
+                int index = _repos.IndexOf(_selected);
                 repo.LastUpdate = Misc.UnixTime;
-                _repos.Add(repo);
+                _repos[index] = repo;
 
                 Files.UpdateRepos(_repos);
                 UpdateRepos();
@@ -185,6 +187,10 @@ namespace Hasty {
 
         private async Task<bool> WalkFolder(Repo repo, DynatreeItem folder, string path = "/") {
             string repoFolder = repo.Folder + "/" + repo.FolderName;
+
+            if (!Directory.Exists(repoFolder))
+                Directory.CreateDirectory(repoFolder);
+
             foreach(DynatreeItem item in folder.children) {
                 if (item.isFolder) { 
                     string folderPath = path + "/" + item.title;
@@ -218,6 +224,7 @@ namespace Hasty {
 
                     _updated++;
                     int lastPercent = 0;
+                    List<double> speedAvg = new List<double>();
 
                     bool res = await Task.Run(async () => {
                         bool result = await TcpData.RequestFile(repo, remotePath, filePath, (long progress, double speed) => {
@@ -229,12 +236,19 @@ namespace Hasty {
                             lastPercent = percCompleted;
 
                             speed /= 1000;
+                            speedAvg.Add(speed);
+
+                            if (speedAvg.Count > 5)
+                                speedAvg.RemoveAt(0);
 
                             Invoke((MethodInvoker)delegate {
-                                progressFile.Value = (int)percCompleted;
+                                double avg = 0;
+                                foreach (double d in speedAvg)
+                                    avg += d;
+                                avg /= speedAvg.Count;
 
-                                if (speed != 0)
-                                    labProcessed.Text = $"Files Processed: {_filesHandled}/{_totalFiles} ({(int)percCompleted}%, {Math.Round(speed, 1)} MB/s)";
+                                labProcessed.Text = $"Processed: {_filesHandled}/{_totalFiles} ({(int)percCompleted}%, {Math.Round(avg, 1)} MB/s)";
+                                
                             });
                         });
                         return result;

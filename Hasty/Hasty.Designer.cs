@@ -31,7 +31,6 @@
             this.labCurrentFile = new System.Windows.Forms.Label();
             this.btnRemove = new Bunifu.Framework.UI.BunifuTileButton();
             this.labProcessed = new System.Windows.Forms.Label();
-            this.progressFile = new Bunifu.Framework.UI.BunifuProgressBar();
             this.progressTotal = new Bunifu.Framework.UI.BunifuProgressBar();
             this.btnUpdate = new Bunifu.Framework.UI.BunifuTileButton();
             this.labUpdated = new System.Windows.Forms.Label();
@@ -102,7 +101,6 @@
             this.panel1.Controls.Add(this.labCurrentFile);
             this.panel1.Controls.Add(this.btnRemove);
             this.panel1.Controls.Add(this.labProcessed);
-            this.panel1.Controls.Add(this.progressFile);
             this.panel1.Controls.Add(this.progressTotal);
             this.panel1.Controls.Add(this.btnUpdate);
             this.panel1.Controls.Add(this.labUpdated);
@@ -119,7 +117,7 @@
             // 
             this.labCurrentFile.AutoSize = true;
             this.labCurrentFile.Font = new System.Drawing.Font("Lucida Grande", 9F);
-            this.labCurrentFile.Location = new System.Drawing.Point(292, 288);
+            this.labCurrentFile.Location = new System.Drawing.Point(292, 324);
             this.labCurrentFile.Name = "labCurrentFile";
             this.labCurrentFile.Size = new System.Drawing.Size(159, 25);
             this.labCurrentFile.TabIndex = 14;
@@ -150,26 +148,12 @@
             // 
             this.labProcessed.AutoSize = true;
             this.labProcessed.Font = new System.Drawing.Font("Lucida Grande", 9F);
-            this.labProcessed.Location = new System.Drawing.Point(292, 257);
+            this.labProcessed.Location = new System.Drawing.Point(292, 293);
             this.labProcessed.Name = "labProcessed";
-            this.labProcessed.Size = new System.Drawing.Size(186, 25);
+            this.labProcessed.Size = new System.Drawing.Size(141, 25);
             this.labProcessed.TabIndex = 12;
-            this.labProcessed.Text = "Files Processed: 0/0";
+            this.labProcessed.Text = "Processed: 0/0";
             this.labProcessed.Visible = false;
-            // 
-            // progressFile
-            // 
-            this.progressFile.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(50)))), ((int)(((byte)(50)))));
-            this.progressFile.BorderRadius = 15;
-            this.progressFile.Location = new System.Drawing.Point(296, 326);
-            this.progressFile.Margin = new System.Windows.Forms.Padding(7, 10, 7, 10);
-            this.progressFile.MaximumValue = 100;
-            this.progressFile.Name = "progressFile";
-            this.progressFile.ProgressColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.progressFile.Size = new System.Drawing.Size(346, 17);
-            this.progressFile.TabIndex = 11;
-            this.progressFile.Value = 0;
-            this.progressFile.Visible = false;
             // 
             // progressTotal
             // 
@@ -281,7 +265,7 @@
             this.MinimizeBox = false;
             this.Name = "HastyForm";
             this.ShowIcon = false;
-            this.Text = "Form1";
+            this.Text = "Hasty";
             this.topBar.ResumeLayout(false);
             this.topBar.PerformLayout();
             this.panel1.ResumeLayout(false);
@@ -304,7 +288,6 @@
         private Bunifu.Framework.UI.BunifuProgressBar progressTotal;
         private Bunifu.Framework.UI.BunifuTileButton btnUpdate;
         private System.Windows.Forms.Label labUpdated;
-        private Bunifu.Framework.UI.BunifuProgressBar progressFile;
         private System.Windows.Forms.Label labProcessed;
         private Bunifu.Framework.UI.BunifuTileButton btnRemove;
         private System.Windows.Forms.Label labCurrentFile;

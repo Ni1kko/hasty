@@ -26,6 +26,7 @@ namespace Hasty {
 
         public static async Task<Tuple<DynatreeItem, Exception>> ReadRepo(string url) {
             try {
+
                 string json = await _client.DownloadStringTaskAsync(new Uri(url));
                 DynatreeItem fileTree = DynatreeItem.JsonToDynatree(json);
 

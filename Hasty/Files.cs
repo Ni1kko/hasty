@@ -116,9 +116,15 @@ namespace Hasty {
 
         public static async Task<string> CheckSum(string filePath) {
             return await Task.Run(() => {
-                using (var inputStream = File.Open(filePath, FileMode.Open)) {
-                    var md5 = MD5.Create();
-                    return Convert.ToBase64String(md5.ComputeHash(inputStream));
+                try {
+                    using (var inputStream = File.Open(filePath, FileMode.Open)) {
+                        var md5 = MD5.Create();
+                        return Convert.ToBase64String(md5.ComputeHash(inputStream));
+                    }
+                }
+                catch(Exception ex) {
+                    MessageBox.Show("Error checking files: " + ex, "An error occured :(", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return "";
                 }
             });
         }

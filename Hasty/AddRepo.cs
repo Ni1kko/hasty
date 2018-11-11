@@ -20,6 +20,16 @@ namespace Hasty {
             if (string.IsNullOrWhiteSpace(url))
                 return;
 
+            if (!url.StartsWith("http://"))
+                url = "http://" + url;
+
+            if (!url.EndsWith(":8090")) {
+                if (url.EndsWith("/")) {
+                    url = url.Substring(0, url.Length - 1);
+                }
+                url = url + ":8090";
+            }
+
 
             string path = txtPath.Text;
 
