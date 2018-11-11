@@ -153,6 +153,7 @@ namespace Hasty {
 
             bool success = await WalkFolder(repo, files);
 
+
             if (_updated > 0 && success) {
 
                 int index = _repos.IndexOf(_selected);
@@ -185,6 +186,11 @@ namespace Hasty {
             }
         }
 
+        private bool _cancel = false;
+        private int _activeThreads = 0;
+        private List<Thread> _threadList = new List<Thread>();
+        private Dictionary<string, double> _progresses = new Dictionary<string, double>();
+
         private async Task<bool> WalkFolder(Repo repo, DynatreeItem folder, string path = "/") {
             string repoFolder = repo.Folder + "/" + repo.FolderName;
 
@@ -192,6 +198,12 @@ namespace Hasty {
                 Directory.CreateDirectory(repoFolder);
 
             foreach(DynatreeItem item in folder.children) {
+                if (_cancel)
+                    return false;
+
+                while (_activeThreads >= 5)
+                    await Task.Delay(50);
+
                 if (item.isFolder) { 
                     string folderPath = path + "/" + item.title;
                     if (!Directory.Exists(repoFolder + "/" + folderPath))
@@ -217,46 +229,61 @@ namespace Hasty {
                     if (File.Exists(filePath)) {
                         string checkSum = await Files.CheckSum(filePath);
                         if (checkSum == item.hash) {
-                            labProcessed.Text = $"Processed: {_filesHandled}/{_totalFiles} (100%)";
+                            labProcessed.Text = $"Processed: {_filesHandled}/{_totalFiles} (Active: {_activeThreads})";
                             continue;
                         }
                     }
 
                     _updated++;
                     int lastPercent = 0;
-                    List<double> speedAvg = new List<double>();
 
-                    bool res = await Task.Run(async () => {
-                        bool result = await TcpData.RequestFile(repo, remotePath, filePath, (long progress, double speed) => {
+                    //if (_progresses.ContainsKey(filePath))
+                        //continue;
+
+                    Thread t = new Thread(async (object thread) => {
+                        _activeThreads++;
+                        bool result = await Ftp.RequestFile(repo, remotePath, filePath, item.fileSize, (long progress) => {
                             int percCompleted = (int)(((float)progress / (float)item.fileSize) * 100);
 
                             if (percCompleted <= lastPercent)
                                 return;
 
                             lastPercent = percCompleted;
-
-                            speed /= 1000;
-                            speedAvg.Add(speed);
-
-                            if (speedAvg.Count > 5)
-                                speedAvg.RemoveAt(0);
+                            _progresses[filePath] = percCompleted;
 
                             Invoke((MethodInvoker)delegate {
-                                double avg = 0;
-                                foreach (double d in speedAvg)
-                                    avg += d;
-                                avg /= speedAvg.Count;
 
-                                labProcessed.Text = $"Processed: {_filesHandled}/{_totalFiles} ({(int)percCompleted}%, {Math.Round(avg, 1)} MB/s)";
-                                
+                                labProcessed.Text = $"Processed: {_filesHandled}/{_totalFiles} (Active: {_progresses.Count})";
+
+                                string tip = "";
+                                foreach (KeyValuePair<string, double> kv in _progresses) {
+                                    tip += Path.GetFileName(kv.Key) + ": " + kv.Value + "%\n";
+                                }
+
+                                toolTip.SetToolTip(labProcessed, tip);
                             });
-                        });
-                        return result;
-                    });
 
-                    
-                    if (!res)
-                        return false;
+                            if (_cancel)
+                                Ftp.Cancel = true;
+
+                            return;
+
+                        });
+                        if (!result)
+                            _cancel = true;
+
+                        _filesHandled++;
+                        _activeThreads--;
+                        _threadList.Remove((Thread)thread);
+                        _progresses.Remove(filePath);
+
+
+                    });
+                    _threadList.Add(t);
+                    t.Start(t);
+
+                    // avoid too many threads starting? slow start?
+                    await Task.Delay(5);
 
                 }
             }

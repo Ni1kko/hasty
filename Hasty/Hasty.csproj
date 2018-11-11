@@ -77,12 +77,14 @@
     <Compile Include="AddRepo.Designer.cs">
       <DependentUpon>AddRepo.cs</DependentUpon>
     </Compile>
+    <Compile Include="Ftp.cs" />
     <Compile Include="Hasty.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Hasty.Designer.cs">
       <DependentUpon>Hasty.cs</DependentUpon>
     </Compile>
+    <Compile Include="Http.cs" />
     <Compile Include="Misc.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

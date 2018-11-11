@@ -23,6 +23,7 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
+            this.components = new System.ComponentModel.Container();
             this.topBar = new System.Windows.Forms.Panel();
             this.btnMinimize = new System.Windows.Forms.Button();
             this.btnExit = new System.Windows.Forms.Button();
@@ -38,6 +39,7 @@
             this.labName = new System.Windows.Forms.Label();
             this.listRepo = new System.Windows.Forms.ListBox();
             this.btnNewRepo = new Bunifu.Framework.UI.BunifuTileButton();
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.topBar.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -249,6 +251,11 @@
             this.btnNewRepo.TabIndex = 4;
             this.btnNewRepo.Click += new System.EventHandler(this.btnNewRepo_Click);
             // 
+            // toolTip
+            // 
+            this.toolTip.AutomaticDelay = 0;
+            this.toolTip.ShowAlways = true;
+            // 
             // HastyForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 28F);
@@ -291,6 +298,7 @@
         private System.Windows.Forms.Label labProcessed;
         private Bunifu.Framework.UI.BunifuTileButton btnRemove;
         private System.Windows.Forms.Label labCurrentFile;
+        public System.Windows.Forms.ToolTip toolTip;
     }
 }
 
