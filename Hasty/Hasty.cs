@@ -153,6 +153,14 @@ namespace Hasty {
 
             bool success = await WalkFolder(repo, files);
 
+            // wait for all downloads to finish
+            while (_activeThreads > 0)
+                await Task.Delay(50);
+
+            // clean up a bit (remove active text)
+            if (success)
+                labProcessed.Text = $"Processed: {_filesHandled}/{_totalFiles}";
+
 
             if (_updated > 0 && success) {
 
@@ -162,6 +170,7 @@ namespace Hasty {
 
                 Files.UpdateRepos(_repos);
                 UpdateRepos();
+
                 MessageBox.Show($"Updating files finished.\nTotal files checked: {_totalFiles}, files updated: {_updated}", "Update Finished", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 _updated = 0;
             } else if (!success) {
@@ -216,10 +225,9 @@ namespace Hasty {
                     string remotePath = path + "/" + item.title;
                     string filePath = repoFolder + "/" + remotePath;
 
-                    _filesHandled++;
-
                     float totalValue = (((float)_filesHandled / (float)_totalFiles) * 100);
-                    progressTotal.Value = (int)totalValue;
+                    if (totalValue <= progressTotal.MaximumValue)
+                        progressTotal.Value = (int)totalValue;
 
                     string fileTitle = item.title;
                     if (fileTitle.Length > 18)
@@ -230,6 +238,7 @@ namespace Hasty {
                         string checkSum = await Files.CheckSum(filePath);
                         if (checkSum == item.hash) {
                             labProcessed.Text = $"Processed: {_filesHandled}/{_totalFiles} (Active: {_activeThreads})";
+                            _filesHandled++;
                             continue;
                         }
                     }
