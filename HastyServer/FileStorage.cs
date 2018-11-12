@@ -14,27 +14,6 @@ namespace HastyServer {
 
         public FileStorage() {
             _settings = Settings.ReadSettings();
-
-            int megs = _settings.CahcingMegs;
-            if (megs > 0) {
-                if (Directory.Exists(_settings.ModFolder)) {
-                    string[] files = Directory.GetFiles(_settings.ModFolder, "*", SearchOption.AllDirectories);
-
-                    int totalBytesUsed = 0;
-                    foreach (string s in files) {
-                        byte[] buf = File.ReadAllBytes(s);
-
-
-                        // techically could fit more files in, but cba to implement more logic
-                        if (buf.Length + totalBytesUsed > megs * 1000000)
-                            break;
-
-                        totalBytesUsed += buf.Length;
-                        FileInfo fi = new FileInfo(s);
-                        _cache.Add(fi.FullName, buf);
-                    }
-                }
-            }
         }
 
         public Stream ReadFile(string file) {

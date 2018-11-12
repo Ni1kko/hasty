@@ -28,7 +28,7 @@ namespace Hasty {
 
                 try {
                     if (_client == null || !_client.Connected) {
-                        _client = new TcpClient(repo.SocketConnection, _port);
+                        _client = new TcpClient(repo.FtpAddress, _port);
                         _stream = _client.GetStream();
                     }
 

@@ -10,11 +10,7 @@ namespace HastyServer
 {
     class Settings
     {
-        public int CahcingMegs;
         public string ModFolder;
-        public int NetworkSpeed;
-        public int MaxSpeed;
-        public int MinSpeed;
 
         public static Settings ReadSettings()
         {
@@ -37,11 +33,7 @@ namespace HastyServer
         public static Settings DefaultSettings()
         {
             Settings s = new Settings();
-            s.CahcingMegs = 0;
             s.ModFolder = "mod";
-            s.NetworkSpeed = 0;
-            s.MaxSpeed = 0;
-            s.MinSpeed = 0;
             return s;
         }
     }

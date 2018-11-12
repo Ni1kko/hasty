@@ -43,10 +43,6 @@ namespace HastyServer {
                 }
 
 
-                TreeCache.processedFiles++;
-
-                Console.Write($"\rHashed files: {TreeCache.processedFiles}/{TreeCache.totalFiles}");
-
                 title = fsi.Name;
                 children = new List<DynatreeItem>();
 
@@ -57,6 +53,9 @@ namespace HastyServer {
                     }
                     hash = "";
                 } else {
+
+                    TreeCache.processedFiles++;
+                    Console.Write($"\rHashed files: {TreeCache.processedFiles}/{TreeCache.totalFiles}");
 
                     isFolder = false;
                     fileSize = new FileInfo(fsi.FullName).Length;
@@ -136,9 +135,8 @@ namespace HastyServer {
 
 
             if (!File.Exists("repo.json")) {
-                Console.WriteLine("Unable to start Hasty server, repo.json is missing");
-                Console.ReadLine();
-                return;
+                Console.WriteLine("Repo.json is missing, setting defaults...");
+                Repo.WriteDefaults();
             }
 
             if (!Directory.Exists(modFolder)) {
@@ -174,15 +172,16 @@ namespace HastyServer {
             HttpServer server = new HttpServer();
             server.RequestReceived += (s, e) => {
                 string path = e.Request.Path;
-                Console.WriteLine("Request for " + path);
 
                 using (var writer = new StreamWriter(e.Response.OutputStream)) {
                     
                     if (path == "/" || path == "/repo.json") {
                         JObject json = JObject.Parse(File.ReadAllText("repo.json"));
-                        json.Add("BufferSize", TcpCommunication.BufferSize);
+
                         writer.Write(json.ToString());
                     } else if (path == "/mod") {
+
+                        Console.WriteLine($"{DateTime.Now.ToShortTimeString()} Request for files from: " + e.Request.UserHostAddress);
 
                         int files = Directory.GetFiles(modFolder, "*", SearchOption.AllDirectories).Length;
                         di.totalFiles = files;

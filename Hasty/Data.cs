@@ -11,11 +11,10 @@ namespace Hasty {
         public string Name;
         public string Url;
         public string RemoteFolder;
-        public string SocketConnection;
+        public string FtpAddress;
         public string FolderName;
         public int LastCheck;
         public int LastUpdate;
-        public int BufferSize;
         public string Folder;
     }
 

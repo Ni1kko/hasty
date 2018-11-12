@@ -12,7 +12,7 @@ namespace Hasty {
         public static async Task<bool> RequestFile(Repo repo, string file, string savePath, long fileLength, Action<long> progress = null) {
 
             try {
-                string url = repo.SocketConnection;
+                string url = repo.FtpAddress;
                 if (!url.StartsWith("http://"))
                     url = "http://" + url;
 

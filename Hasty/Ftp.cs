@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,17 +18,12 @@ namespace Hasty {
                 if (Cancel)
                     return false;
 
-                string ftpUrl = repo.SocketConnection;
-                if (ftpUrl.StartsWith("ftp://"))
-                    ftpUrl = ftpUrl.Replace("ftp://", "");
+                bool isGood = IPAddress.TryParse(repo.FtpAddress, out IPAddress ipAddr);
+                if (!isGood)
+                    throw new Exception("Invalid FTP connection IP provided");
 
-                ftpUrl = ftpUrl.Replace("/", "");
 
-                string[] parts = ftpUrl.Split(':');
-                if (parts.Length != 2)
-                    throw new Exception("Invalid IP, port number not defined or is incorrect: " + ftpUrl);
-
-                FtpClient client = new FtpClient(parts[0], int.Parse(parts[1]), "anonymous", "");
+                FtpClient client = new FtpClient(repo.FtpAddress, 6969, "anonymous", "");
 
                 await client.ConnectAsync();
 

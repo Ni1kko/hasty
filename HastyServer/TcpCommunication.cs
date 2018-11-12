@@ -14,7 +14,7 @@ namespace HastyServer {
 
         static int _port = 6969;
         static int _clientsConnected = 0;
-        static FileStorage _fileStorage = new FileStorage();
+        //static FileStorage _fileStorage = new FileStorage();
         static int _sleepTime = 1;
 
         public static int BufferSize { get; private set; } = 10240;
@@ -59,7 +59,7 @@ namespace HastyServer {
                             return;
                         }
 
-                        Stream fileStream = _fileStorage.ReadFile(file);
+                        Stream fileStream = null; //_fileStorage.ReadFile(file);
 
                         int NoOfPackets = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(fileStream.Length) / Convert.ToDouble(BufferSize)));
                         int TotalLength = (int)fileStream.Length, CurrentPacketLength;
@@ -104,25 +104,6 @@ namespace HastyServer {
         public static void StartListener() {
 
             Settings settings = Settings.ReadSettings();
-
-            // dank maths (50 mbits)
-            int maxSpeed = settings.MaxSpeed;
-
-            if (maxSpeed <= 0)
-            {
-                // cap to 10 megbytes a sec by default (80 mbits)
-                BufferSize = 10240;
-            }
-            else
-            {
-                //maxSpeed *= 1000000; // mbits to bits
-                //maxSpeed /= 8; // bits to bytes
-                //               // 50 * 1 000 000, / 8, = 6 250 000
-                //BufferSize = maxSpeed / 1000; // devivded by 1000 because 1000 packets a sec
-                //BufferSize *= _sleepTime;
-
-                Console.WriteLine("Buffer size: " + BufferSize);
-            }
         
 
 

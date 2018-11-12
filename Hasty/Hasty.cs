@@ -119,7 +119,6 @@ namespace Hasty {
                 return;
             }
 
-            TcpData.BufferSize = repo.BufferSize;
 
             if (repo != _selected) {
                 repo.LastCheck = Misc.UnixTime;
@@ -152,6 +151,22 @@ namespace Hasty {
             labProcessed.Visible = true;
 
             bool success = await WalkFolder(repo, files);
+
+            // make sure all the paths are rooted
+            for (int i = 0; i < _allFiles.Count; i++) {
+                _allFiles[i] = Path.GetFullPath(_allFiles[i]);
+            }
+
+
+            // delete unwanted files
+            string[] currentFiles = Directory.GetFiles(repo.Folder + "/" + repo.FolderName, "*", SearchOption.AllDirectories);
+            foreach (string s in currentFiles) {
+                string full = Path.GetFullPath(s);
+
+                if (!_allFiles.Contains(full)) {
+                    File.Delete(full);
+                }
+            }
 
             // wait for all downloads to finish
             while (_activeThreads > 0)
@@ -197,8 +212,9 @@ namespace Hasty {
 
         private bool _cancel = false;
         private int _activeThreads = 0;
-        private List<Thread> _threadList = new List<Thread>();
-        private Dictionary<string, double> _progresses = new Dictionary<string, double>();
+        private Dictionary<string, double> _activeDownloads = new Dictionary<string, double>();
+
+        private List<string> _allFiles = new List<string>();
 
         private async Task<bool> WalkFolder(Repo repo, DynatreeItem folder, string path = "/") {
             string repoFolder = repo.Folder + "/" + repo.FolderName;
@@ -225,6 +241,8 @@ namespace Hasty {
                     string remotePath = path + "/" + item.title;
                     string filePath = repoFolder + "/" + remotePath;
 
+                    _allFiles.Add(filePath);
+
                     float totalValue = (((float)_filesHandled / (float)_totalFiles) * 100);
                     if (totalValue <= progressTotal.MaximumValue)
                         progressTotal.Value = (int)totalValue;
@@ -249,31 +267,31 @@ namespace Hasty {
                     //if (_progresses.ContainsKey(filePath))
                         //continue;
 
-                    Thread t = new Thread(async (object thread) => {
+                    Thread t = new Thread(async () => {
                         _activeThreads++;
                         bool result = await Ftp.RequestFile(repo, remotePath, filePath, item.fileSize, (long progress) => {
                             int percCompleted = (int)progress;
+
+                            if (_cancel)
+                                Ftp.Cancel = true;
 
                             if (percCompleted <= lastPercent)
                                 return;
 
                             lastPercent = percCompleted;
-                            _progresses[filePath] = percCompleted;
+                            _activeDownloads[filePath] = percCompleted;
 
                             Invoke((MethodInvoker)delegate {
 
-                                labProcessed.Text = $"Processed: {_filesHandled}/{_totalFiles} (Active: {_progresses.Count})";
+                                labProcessed.Text = $"Processed: {_filesHandled}/{_totalFiles} (Active: {_activeDownloads.Count})";
 
                                 string tip = "";
-                                foreach (KeyValuePair<string, double> kv in _progresses.ToList()) {
+                                foreach (KeyValuePair<string, double> kv in _activeDownloads.ToList()) {
                                     tip += Path.GetFileName(kv.Key) + ": " + kv.Value + "%\n";
                                 }
 
                                 toolTip.SetToolTip(labProcessed, tip);
                             });
-
-                            if (_cancel)
-                                Ftp.Cancel = true;
 
                             return;
 
@@ -283,13 +301,10 @@ namespace Hasty {
 
                         _filesHandled++;
                         _activeThreads--;
-                        _threadList.Remove((Thread)thread);
-                        _progresses.Remove(filePath);
-
+                        _activeDownloads.Remove(filePath);
 
                     });
-                    _threadList.Add(t);
-                    t.Start(t);
+                    t.Start();
 
                     // avoid too many threads starting? slow start?
                     await Task.Delay(5);

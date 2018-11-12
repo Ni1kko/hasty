@@ -85,10 +85,10 @@ namespace Hasty {
                 ret.RemoteFolder = newer.RemoteFolder;
             }
 
-            if (newer.SocketConnection == null) {
-                ret.SocketConnection = old.SocketConnection;
+            if (newer.FtpAddress == null) {
+                ret.FtpAddress = old.FtpAddress;
             } else {
-                ret.SocketConnection = newer.SocketConnection;
+                ret.FtpAddress = newer.FtpAddress;
             }
 
             if (newer.FolderName == null) {

@@ -52,8 +52,6 @@ namespace Hasty {
 
 
                 string data = await wc.DownloadStringTaskAsync(new Uri(url));
-                //File.WriteAllBytes(filePath, new Ascii85().Decode(data));
-
 
                 wc.Dispose();
                 return true;
