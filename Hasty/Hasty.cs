@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -108,6 +109,15 @@ namespace Hasty {
         private async void btnUpdate_Click(object sender, EventArgs e) {
             if (_selected == null)
                 return;
+
+            Process[] p1 = Process.GetProcessesByName("arma3_x64");
+            Process[] p2 = Process.GetProcessesByName("arma3");
+            if (p1.Length > 0 || p2.Length > 0) {
+                DialogResult dialogRes =  MessageBox.Show("Arma 3 is running, this may cause errors. Do you want to continue?", "Arma 3 is running", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                if (dialogRes == DialogResult.No)
+                    return;
+            }
+
 
             ButtonsEnable(false);
 
