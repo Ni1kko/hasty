@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
+﻿using System; 
+using System.Net; 
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -18,13 +15,17 @@ namespace Hasty {
 
                 url = url + "/mod/" + file;
 
-                WebClient wc = new WebClient();
+                var wc = new WebClient();
 
                 wc.DownloadProgressChanged += (s,e) => {
-                    progress(e.ProgressPercentage);
+                    progress?.Invoke(e.ProgressPercentage);
                 };
-
+ 
                 wc.DownloadFileAsync(new Uri(url), savePath);
+
+                await Task.Delay(1);
+
+                wc.Dispose(); 
 
             } catch (Exception ex) {
                 MessageBox.Show("File download failed: " + ex, "An error occured :(", MessageBoxButtons.OK, MessageBoxIcon.Error);

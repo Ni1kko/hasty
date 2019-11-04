@@ -1,19 +1,13 @@
 ﻿using FluentFTP;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading;
+using System; 
+using System.Net; 
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Hasty {
     class Ftp {
         public static bool Cancel { get; set; } = false;
-        public static async Task<bool> RequestFile(Repo repo, string file, string savePath, long fileLength, Action<long> progress = null) {
+        public static async Task<bool> RequestFile(Repo repo, string file, string savePath, long fileLength, Action<FtpProgress> progress = null) {
             try {
                 if (Cancel)
                     return false;
@@ -27,8 +21,9 @@ namespace Hasty {
 
                 await client.ConnectAsync();
 
-                await client.DownloadFileAsync(savePath, file, true, FtpVerify.None, new Progress<double>(async x => {
-                    progress((long)x);
+                await client.DownloadFileAsync(savePath, file, FtpLocalExists.Overwrite, FtpVerify.None, new Progress<FtpProgress>(async x =>
+                {
+                    progress(x);
 
                     if (Cancel) {
                         await client.DisconnectAsync();

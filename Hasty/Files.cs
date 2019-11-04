@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+using System.IO; 
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Newtonsoft.Json; 
 using System.Security.Cryptography;
 
 namespace Hasty {

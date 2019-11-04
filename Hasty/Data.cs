@@ -1,10 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using Newtonsoft.Json; 
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO; 
 
 namespace Hasty {
     class Repo {
@@ -43,9 +39,7 @@ namespace Hasty {
                 isFolder = false;
             }
             hash = title.Replace(" ", "").ToLower();
-        }
-
-        public DynatreeItem() { }
+        } 
 
         public string DynatreeToJson() {
             string json = JsonConvert.SerializeObject(this);

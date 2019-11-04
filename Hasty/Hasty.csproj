@@ -52,27 +52,19 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Bunifu_UI_v1.52">
-      <HintPath>.\Bunifu_UI_v1.52.dll</HintPath>
+    <Reference Include="Bunifu_UI_v1.5.3">
+      <HintPath>..\..\..\..\DevApps\Bunifu ui\Bunifu_UI_v1.5.3.dll</HintPath>
     </Reference>
-    <Reference Include="FluentFTP, Version=19.2.2.0, Culture=neutral, PublicKeyToken=f4af092b1d8df44f, processorArchitecture=MSIL">
-      <HintPath>..\packages\FluentFTP.19.2.2\lib\net45\FluentFTP.dll</HintPath>
+    <Reference Include="FluentFTP, Version=28.0.1.0, Culture=neutral, PublicKeyToken=f4af092b1d8df44f, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentFTP.28.0.1\lib\net45\FluentFTP.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddRepo.cs">
